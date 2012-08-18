@@ -5,7 +5,8 @@
 Contributors:
 Alexander Grabanski */
 typedef struct {
-    scalar_t wheels[4];
+    scalar_t wheel[4];
+}
 drivetrain;
 /* Some background info:
 -All angles are in radians, from 0
