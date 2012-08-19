@@ -9,15 +9,26 @@ Contributors:
 Alexander Grabanski
 */
 
+/* I understand HOW this function works, but I don't understand the why. 
+It just works. Without it, the motors cannot give maximum speed. I derived
+it by doing automated testing and guessing at the nature of the problem
+and seeing that it worked. However, there should be nothing wrong about
+this function -- I am absolutely certain that it works -- I have verified
+it graphically. However, I am uncertain as to WHY it works. */
+
+scalar_t magicFunc(scalar_t angle) {
+    return 1.0 / sin(fmod(angle, 3.1415926535 / 2.0 ) + (3.1415926535 / 4.0));
+}
 
 /* moveAngle in radians, moveMult is [-1, 1] {1 being forward}, 
 turnMult is [-1, 1] {clockwise rate of turning with 1 being max}. */
 drivetrain mecanumBasicPolar(scalar_t moveAngle, scalar_t moveMult, scalar_t turnMult) {
      drivetrain result;
-     result.wheel[0] = moveMult * cos(moveAngle - (PI / 4.0)) - turnMult;
-     result.wheel[1] = moveMult * sin(moveAngle - (PI / 4.0)) - turnMult;
-     result.wheel[2] = moveMult * cos(moveAngle - (PI / 4.0)) + turnMult;
-     result.wheel[3] = moveMult * sin(moveAngle - (PI / 4.0)) + turnMult;
+     scalar_t magic = magicFunc(moveAngle);
+     result.wheel[0] = moveMult * cos(moveAngle - (PI / 4.0)) * magic - turnMult;
+     result.wheel[1] = moveMult * sin(moveAngle - (PI / 4.0)) * magic - turnMult;
+     result.wheel[2] = moveMult * cos(moveAngle - (PI / 4.0)) * magic + turnMult;
+     result.wheel[3] = moveMult * sin(moveAngle - (PI / 4.0)) * magic + turnMult;
      return result;
 }
 /* Takes a circular joystick input for strafing and an input for turning,

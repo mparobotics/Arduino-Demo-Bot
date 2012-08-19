@@ -27,7 +27,7 @@ The multiplier for turning can be obtained by
 for forward movement is given by y=((abs(x)+1)/2) * x 
 where y is output scale and x is forward input scale*/
 scalar_t joyScaleAbs(scalar_t strafeMag, scalar_t turnMag) {
-    return (abs(strafeMag) - abs(turnMag) + 1)/2;
+    return ((fabs(strafeMag) - fabs(turnMag)) + 1.0)/2.0;
 }
 
 /* Same thing as joyScaleAbs, but squares each component instead
@@ -37,15 +37,15 @@ want to use this for driving, because it also allows precision
 movement in the low range. Power curve is given by
 y = (x * x + 1)/2  *  x*/
 scalar_t joyScaleSqr(scalar_t strafeMag, scalar_t turnMag) {
-    return (strafeMag * strafeMag - turnMag * turnMag + 1)/2;
+    return (strafeMag * strafeMag - turnMag * turnMag + 1.0)/2.0;
 }
 
 /* Same thing, but takes the square root of the square root of
 the absolute value of each component. Why? It gives a roughly
 linear power curve. Power curve given by
-y = (sqrt(sqrt(abs(x))) + 1)/2  * x */
+y = (sqrt(sqrt(fabs(x))) + 1)/2  * x */
 scalar_t joyScaleSqrt(scalar_t strafeMag, scalar_t turnMag) {
-    return (sqrt(sqrt(abs(strafeMag))) - sqrt(sqrt(abs(turnMag))) + 1)/2;
+    return (sqrt(sqrt(fabs(strafeMag))) - sqrt(sqrt(fabs(turnMag))) + 1)/2;
 }
 
 /* This function is unrelated to the others -- it converts a

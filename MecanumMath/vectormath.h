@@ -38,7 +38,11 @@ vector2d sub(vector2d a, vector2d b) {
     return add(a, flip(b));
 }
 scalar_t angle(vector2d a) {
-    return atan2(a.y,a.x); //result is in radians
+    scalar_t result = atan2(a.y,a.x);
+    if (result < 0.0) {
+        result += PI * 2;
+    }
+    return result; //result is in radians
 }
 vector2d polarvec(scalar_t angle, scalar_t r) {
     return vec(r * cos(angle), r * sin(angle));
