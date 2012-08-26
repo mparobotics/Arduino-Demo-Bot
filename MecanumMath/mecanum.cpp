@@ -6,7 +6,7 @@
 int main() {
     scalar_t angle = 0.0;
     while (angle < (2.0 * 3.1415926535)) {
-        drivetrain test = simpleMecanum(polarvec(angle, 1.0), 0.0, &joyScaleSqr);
+        drivetrain test = simpleMecanum(polarvec(angle, 1.0), 1.0, &joyScaleSqr);
         scalar_t max = 0.0;
         int i = 0;
         while (i < 4) {
