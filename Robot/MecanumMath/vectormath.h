@@ -1,4 +1,5 @@
 #include <math.h>
+typedef double scalar_t;
 #if !defined(VECTORMATH)
 #define VECTORMATH
 #define PI 3.14159265357
@@ -10,7 +11,7 @@ Alex Grabanski
 */
 typedef double scalar_t;
 typedef struct {scalar_t x; scalar_t y;} vector2d;
-vector2d vec(scalar_t x, float_t y) {
+vector2d vec(scalar_t x, scalar_t y) {
     vector2d result;
     result.x = x;
     result.y = y;

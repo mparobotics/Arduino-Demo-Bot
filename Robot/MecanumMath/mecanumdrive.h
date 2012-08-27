@@ -1,5 +1,8 @@
 #include "mecanumcommon.h"
 #include "joyconvert.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 #if !defined(MECANUMDRIVE)
 #define MECANUMDRIVE
 /*Library for actually doing the math required to drive a mecanum
@@ -88,4 +91,7 @@ drivetrain stupidMecanum(vector2d leftJoy, vector2d rightJoy) {
     return result;
 }
 
+#endif
+#ifdef __cplusplus
+}
 #endif

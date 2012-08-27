@@ -1,6 +1,8 @@
+#include <Servo.h>
+
 #include <SPI.h>
-#include "drive.h"
-#include "../mecanumdrive.h"
+#include <mecanumdrive.h>
+#include <drive.h>
 Servo motors[4];
 void setup() {
     motors[0].attach(5);
