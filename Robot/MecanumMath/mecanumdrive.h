@@ -28,10 +28,10 @@ turnMult is [-1, 1] {clockwise rate of turning with 1 being max}. */
 drivetrain mecanumBasicPolar(scalar_t moveAngle, scalar_t moveMult, scalar_t turnMult) {
      drivetrain result;
      scalar_t magic = magicFunc(moveAngle);
-     result.wheel[0] = moveMult * cos(moveAngle - (PI / 4.0)) * magic - turnMult;
-     result.wheel[1] = moveMult * sin(moveAngle - (PI / 4.0)) * magic - turnMult;
-     result.wheel[2] = moveMult * cos(moveAngle - (PI / 4.0)) * magic + turnMult;
-     result.wheel[3] = moveMult * sin(moveAngle - (PI / 4.0)) * magic + turnMult;
+     result.wheel[0] = moveMult * cos(-moveAngle - (PI * -.75)) * magic - turnMult;
+     result.wheel[1] = moveMult * sin(-moveAngle - (PI * -.75)) * magic - turnMult;
+     result.wheel[2] = moveMult * cos(-moveAngle - (PI * -.75)) * magic + turnMult;
+     result.wheel[3] = moveMult * sin(-moveAngle - (PI * -.75)) * magic + turnMult;
      return result;
 }
 /* Takes a circular joystick input for strafing and an input for turning,
