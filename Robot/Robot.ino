@@ -21,17 +21,22 @@ void loop() {
    Serial.println(millis() - watch);
    if ((millis() - watch) < 20) {
      //Serial.println(in.data);
-     Serial.println("joysticks:");
-     Serial.println(getLeftJoy(in).x);
-     Serial.println(getLeftJoy(in).y);
+     //Serial.println("joysticks:");
+     //Serial.println(getLeftJoy(in).x);
+     //Serial.println(getLeftJoy(in).y);
      //Serial.println(getRightJoy(in).x);
-     test = simpleMecanum(getLeftJoy(in), getRightJoy(in).x, &joyScaleAbs);
+     vector2d leftjoy = joyScaleSquareCircle(getLeftJoy(in));
+     test = simpleMecanum(leftjoy, getRightJoy(in).x, &joyScaleAbs);
+     Serial.print(test.wheel[0]); Serial.print(" ,");
+     Serial.print(test.wheel[1]); Serial.print(" ,");
+     Serial.print(test.wheel[2]); Serial.print(" ,");
+     Serial.print(test.wheel[3]); Serial.println(" ");
    }
    else {
        test = simpleMecanum(vec(0.0,0.0),0.0,&joyScaleAbs);
    }
    
-   delay(30);
+   delay(100);
    
    /*
    drivetrain test =  simpleMecanum(vec(0.5,0.0), 0.0, &joyScaleAbs); */
