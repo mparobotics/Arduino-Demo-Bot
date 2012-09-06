@@ -14,17 +14,24 @@ void setup() {
     netSetup();
     Serial.begin(9600);
 }
+drivetrain test = simpleMecanum(vec(0.0,0.0),0.0,&joyScaleAbs);
 void loop() {
   long watch = millis();
    packet in = readPacket();
-
-   //Serial.println(in.data);
-   Serial.println("joysticks:");
-   Serial.println(getLeftJoy(in).x);
-   Serial.println(getLeftJoy(in).y);
-   //Serial.println(getRightJoy(in).x);
-   drivetrain test = simpleMecanum(getLeftJoy(in), getRightJoy(in).x, &joyScaleAbs);
-   delay(100);
+   Serial.println(millis() - watch);
+   if ((millis() - watch) < 20) {
+     //Serial.println(in.data);
+     Serial.println("joysticks:");
+     Serial.println(getLeftJoy(in).x);
+     Serial.println(getLeftJoy(in).y);
+     //Serial.println(getRightJoy(in).x);
+     test = simpleMecanum(getLeftJoy(in), getRightJoy(in).x, &joyScaleAbs);
+   }
+   else {
+       test = simpleMecanum(vec(0.0,0.0),0.0,&joyScaleAbs);
+   }
+   
+   delay(30);
    
    /*
    drivetrain test =  simpleMecanum(vec(0.5,0.0), 0.0, &joyScaleAbs); */
