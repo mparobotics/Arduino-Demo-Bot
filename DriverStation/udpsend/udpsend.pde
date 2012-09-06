@@ -25,14 +25,16 @@ ControllButton trigger;
    //udp.listen( true );           // and wait for incoming message  
  
    controllIO = ControllIO.getInstance(this);
-   joypad = controllIO.getDevice("Logitech Attack 3");
-   joypad2 = controllIO.getDevice("Logitech Attack 3");
+   // controllIO.printDevices(); THIS IS A DEBUG LINE -- USE IT IF CONTROL
+   // is not working!
+   joypad = controllIO.getDevice(3);
+  // joypad2 = controllIO.getDevice(4);
   
    trigger = joypad.getButton(0);
    stickx1 = joypad.getSlider(0);
    sticky1 = joypad.getSlider(1);
-   stickx2 = joypad2.getSlider(0);
-   sticky2 = joypad2.getSlider(1);
+  // stickx2 = joypad2.getSlider(0);
+  // sticky2 = joypad2.getSlider(1);
  }
  
 /*this function converts from a floating-point in the range of -1.0 to 1.0 to an
@@ -59,15 +61,19 @@ byte[] concatbytes(float A, float B, float C, float D) {
 
  void draw()
  {
-   String ip       = "192.168.1.178"; // the remote IP address
+   String ip       = "10.39.26.123"; // the remote IP address
    int port        = 8888;        // the destination port
    float joyx1 = stickx1.getValue();
-   float joyy1 = sticky1.getValue();
-   float joyx2 = stickx2.getValue();
-   float joyy2 = sticky2.getValue();
+   float joyy1 = -1.0 * sticky1.getValue(); 
+   //float joyx2 = stickx2.getValue();
+   //float joyy2 = -1.0 * sticky2.getValue();
+   float joyx2 = 0.0;
+   float joyy2 = 0.0;
+   //println(concatbytes(joyx1, joyy1, joyx2, joyy2));
    udp.send(concatbytes(joyx1, joyy1, joyx2, joyy2), ip, port );   // the message to send
-   delay(33); //Keep us operating at about 30 packets per second
+   delay(100); //Keep us operating at about 50 packets per second
               //FIXME: determine reasonable limits for this
+   //NOTE: WE'RE DEALING WITH A SQUARE JOYSTICK!!!!!!!
  }
 /* 
  void keyPressed() {
