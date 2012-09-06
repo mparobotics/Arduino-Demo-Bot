@@ -58,6 +58,7 @@ byte[] concatbytes(float A, float B, float C, float D) {
     return concatbytes(convertControl(A), convertControl(B), 
     convertControl(C), convertControl(D));
 }
+byte[] packettimer = new byte[1];
 
  void draw()
  {
@@ -70,7 +71,8 @@ byte[] concatbytes(float A, float B, float C, float D) {
    float joyx2 = 0.0;
    float joyy2 = 0.0;
    //println(concatbytes(joyx1, joyy1, joyx2, joyy2));
-   udp.send(concatbytes(joyx1, joyy1, joyx2, joyy2), ip, port );   // the message to send
+   packettimer[0] = (byte) (packettimer[0] + 1);
+   udp.send(concatbytes(concatbytes(joyx1, joyy1, joyx2, joyy2), packettimer), ip, port );   // the message to send
    delay(200); //Keep us operating at about 20 packets per second
               //FIXME: determine reasonable limits for this
    //NOTE: WE'RE DEALING WITH A SQUARE JOYSTICK!!!!!!!
