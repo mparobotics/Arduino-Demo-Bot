@@ -38,7 +38,8 @@ void loop() {
      //Serial.println(getLeftJoy(in).y);
      //Serial.println(getRightJoy(in).x);
      vector2d leftjoy = joyScaleSquareCircle(getLeftJoy(in));
-     test = simpleMecanum(leftjoy, 0.0, &joyScaleAbs);
+     scalar_t rightjoy = getRightJoy(in).x;
+     test = simpleMecanum(leftjoy, rightjoy, &joyScaleAbs);
      Serial.print(test.wheel[0]); Serial.print(" ,");
      Serial.print(test.wheel[1]); Serial.print(" ,");
      Serial.print(test.wheel[2]); Serial.print(" ,");
@@ -48,6 +49,7 @@ void loop() {
        test = simpleMecanum(vec(0.0,0.0),0.0,&joyScaleAbs);
    }
    packettimer = in.data[4];
+   simpleServoDrive(drivetrainToServo(test), motors);
    delay(100);
    
    /*

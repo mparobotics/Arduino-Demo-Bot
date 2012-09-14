@@ -32,7 +32,9 @@ ControllButton trigger;
   
    trigger = joypad.getButton(0);
    stickx1 = joypad.getSlider(0);
+   stickx1.setTolerance(0.04);
    sticky1 = joypad.getSlider(1);
+   sticky1.setTolerance(0.04);
   // stickx2 = joypad2.getSlider(0);
   // sticky2 = joypad2.getSlider(1);
  }
@@ -65,7 +67,19 @@ byte[] packettimer = new byte[1];
    String ip       = "10.39.26.123"; // the remote IP address
    int port        = 8888;        // the destination port
    float joyx1 = stickx1.getValue();
-   float joyy1 = -1.0 * sticky1.getValue(); 
+   float joyy1 = -1.0 * sticky1.getValue();
+   /* Theoretically, this code shouldn't be needed
+   if (abs(joyx1) < 0.04) {
+     joyx1 = 0.0; //Eliminate joystick dead-zone inputs
+   }
+   if (abs(joyy1) < 0.04) {
+     joyy1 = 0.0;
+   } */
+   
+   if (trigger.pressed()) {
+      joyx1 = joyx1 * 0.5;
+      joyy1 = joyy1 * 0.5; //precision mode
+   }
    //float joyx2 = stickx2.getValue();
    //float joyy2 = -1.0 * sticky2.getValue();
    float joyx2 = 0.0;
