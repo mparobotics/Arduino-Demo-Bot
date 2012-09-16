@@ -106,7 +106,8 @@ typedef struct {
 
 /* Okay, now for the interesting stuff. This function takes the current velocity
 and a force of instant acceleration to be applied over time t [seconds], and returns
-the new velocity at the end of the time interval */
+the new velocity at the end of the time interval NOTE: Velocities relative to current
+heading.*/
 mecanumVel integrateAccel(mecanumVel init, mecanumInstant accelForce, scalar_t t) {
     mecanumVel result;
     result.strafeVel.x = accumFunc(init.strafeVel.x, accelForce.strafeAccel.x, strafeCf, t);
@@ -134,11 +135,19 @@ mecanumPosAndVel inferPos(mecanumPosAndVel init, drivetrain drive, scalar_t t) {
     mecanumInstant accel = inferAccel(drive);
     mecanumVel vel = init.velocity;
     result.velocity = inferVel(vel, drive, t);
-    result.position.x = accumIntegral(init.position.x, vel.strafeVel.x,
-                                      accel.strafeAccel.x, strafeCf, t);
-    result.position.y = accumIntegral(init.position.y, vel.strafeVel.y,
-                                      accel.strafeAccel.y, strafeCf, t);
+
     result.angle = accumIntegral(init.angle, vel.turnVel, accel.turnAccel, turnCf, t);
+
+    //LOL hax begin here (to account for rotation)
+    scalar_t mid = (init.angle + result.angle) / 2.0;
+
+    vector2d absvel = rotatevec(vel.strafeVel, mid);
+    vector2d absaccel = rotatevec(accel.strafeAccel, mid);
+
+    result.position.x = accumIntegral(init.position.x, absvel.x,
+                                      absaccel.x, strafeCf, t);
+    result.position.y = accumIntegral(init.position.y, absvel.y,
+                                      absaccel.y, strafeCf, t);
     return result;
 }
 

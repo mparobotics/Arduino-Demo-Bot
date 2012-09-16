@@ -48,4 +48,8 @@ scalar_t angle(vector2d a) {
 vector2d polarvec(scalar_t angle, scalar_t r) {
     return vec(r * cos(angle), r * sin(angle));
 }
+vector2d rotatevec(vector2d v, scalar_t ang) {
+    return polarvec(angle(v) + ang, len(v));
+}
+
 #endif
