@@ -5,6 +5,7 @@
 #include <mecanumdrive.h>
 #include <drive.h>
 #include <communications.h>
+//#include <gyro.h>
 Servo motors[4];
 void setup() {
     motors[0].attach(5);
@@ -14,6 +15,7 @@ void setup() {
     netSetup();
     Serial.begin(9600);
 }
+//scalar_t rot = 0.0; // the rotation of the robot
 char packettimer = 0; //An arbitrary clock that verifies that we have activity
 char violationcount = 0; //A counter of violations of the clock
 drivetrain test = simpleMecanum(vec(0.0,0.0),0.0,&joyScaleAbs);
@@ -51,6 +53,13 @@ void loop() {
    packettimer = in.data[4];
    simpleServoDrive(drivetrainToServo(test), motors);
    delay(100);
+   /*
+   unsigned long gyrotimer = millis();
+   while (millis() - gyrotimer < 100) { // 100 ms gyro sampling period
+       rot = easyGyroPos(rot);
+       delay(5);
+   }
+   */
    
    /*
    drivetrain test =  simpleMecanum(vec(0.5,0.0), 0.0, &joyScaleAbs); */
