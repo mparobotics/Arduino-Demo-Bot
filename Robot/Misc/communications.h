@@ -2,11 +2,15 @@
 
 Contributors:
 Alex Grabanski */
+
+#ifndef COMMUNICATIONS_DEFINED
+#define COMMUNICATIONS_DEFINED
+
 #include <Ethernet.h>
 #include <EthernetUdp.h>
-#include <vectormath.h>
 
-byte mac[] = { 0x90, 0xA2, 0xDA, 0x00, 0xD5, 0x13 };
+//byte mac[] = { 0x90, 0xA2, 0xDA, 0x00, 0xD5, 0x13 };
+byte mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0x45, 0x55 };
 IPAddress ip(10, 39, 26, 123);
 
 unsigned int localPort = 8888;
@@ -27,11 +31,19 @@ packet readPacket() {
     packet result;
     Udp.read(result.data,UDP_TX_PACKET_MAX_SIZE);
     // send reply
-    Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.write("acknowledged");
-    Udp.endPacket();
+    //Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+    //Udp.write("acknowledged");
+    //Udp.endPacket();
     return result;
 }
+void sendPacket(packet in) {
+      Udp.parsePacket();
+      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+      Udp.write((uint8_t*) in.data, UDP_TX_PACKET_MAX_SIZE);
+      Udp.endPacket();
+      return;
+}
+
 scalar_t toAxis(char b) {
     return (b / 127.0);
 }
@@ -41,3 +53,5 @@ vector2d getLeftJoy(packet p) {
 vector2d getRightJoy(packet p) {
     return vec(toAxis(p.joystickaxes[2]), toAxis(p.joystickaxes[3]));
 }
+   
+#endif 

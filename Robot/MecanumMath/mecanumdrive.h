@@ -12,41 +12,42 @@ Contributors:
 Alexander Grabanski
 */
 
-/* I understand HOW this function works, but I don't understand the why. 
-It just works. Without it, the motors cannot give maximum speed. I derived
-it by doing automated testing and guessing at the nature of the problem
-and seeing that it worked. However, there should be nothing wrong about
-this function -- I am absolutely certain that it works -- I have verified
-it graphically. However, I am uncertain as to WHY it works. */
-
-scalar_t magicFunc(scalar_t angle) {
-    return 1.0 / sin(fmod(angle, 3.1415926535 / 2.0 ) + (3.1415926535 / 4.0));
-}
-
-/* moveAngle in radians, moveMult is [-1, 1] {1 being forward}, 
-turnMult is [-1, 1] {clockwise rate of turning with 1 being max}. */
-drivetrain mecanumBasicPolar(scalar_t moveAngle, scalar_t moveMult, scalar_t turnMult) {
-     drivetrain result;
-     scalar_t magic = magicFunc(moveAngle);
-     result.wheel[0] = moveMult * cos(-moveAngle - (PI * -.75)) * magic - turnMult;
-     result.wheel[1] = moveMult * sin(-moveAngle - (PI * -.75)) * magic - turnMult;
-     result.wheel[2] = moveMult * cos(-moveAngle - (PI * -.75)) * magic + turnMult;
-     result.wheel[3] = moveMult * sin(-moveAngle - (PI * -.75)) * magic + turnMult;
-     return result;
-}
-/* Takes a circular joystick input for strafing and an input for turning,
-then takes a pointer to a joystick conversion function (e.g: &joyScaleAbs)
-Automagically returns a drivetrain struct from given data
-This is the "smart, but simple" approach to mecanum control, and it is
-currently the only one in this header that provides and easy way
-to give movement relative to a driver.
-*/
+//assumptions: strafeJoy is a circular joystick, turnJoy is linearly scaled
+//joyScalefptr returns a scaling factor to keep motor values in range
+//while turning and moving at the same time
 drivetrain simpleMecanum(vector2d strafeJoy, scalar_t turnJoy, 
                         scalar_t (*joyScalefptr)(scalar_t, scalar_t)) {
-    scalar_t moveMult = (*joyScalefptr)(len(strafeJoy), turnJoy);
-    return mecanumBasicPolar(angle(strafeJoy), len(strafeJoy) * moveMult, turnJoy * (1 - moveMult));
-}
+    //a transformation from the joystick coordinate system
+    //to the rotated diamond system of a mecanum drive
+    vector2d strafe = circleToDiamond(strafeJoy);
+    //get the magnitude of the desired strafing movement
+    scalar_t strafeMagnitude = len(strafeJoy);
 
+    //get a multiplier for movement [1 - moveMult = multiplier for turns]
+    scalar_t moveMult = (*joyScalefptr)(strafeMagnitude, turnJoy);
+    scalar_t turnMult = 1.0 - moveMult;
+
+    vector2d scaledStrafe = scale(strafe, moveMult);
+    //invert, because we want negative turnJoy to mean
+    //a positive [increasing theta] turn
+    scalar_t scaledTurn = -1.0 * turnMult * turnJoy;
+
+    //now, project the strafe vector onto the corresponding
+    //unit direction vectors for each wheel
+    //and add the contributions due to turning, as well.
+    //wheels are numbered clockwise from front-left , and forward values
+    //means positive values
+
+    vector2d upRight = scale(vec(1,1), sqrt(2.0) / 2.0);
+    vector2d upLeft = scale(vec(-1,1), sqrt(2.0) / 2.0);
+
+    drivetrain result;
+    result.wheel[0] = dot(scaledStrafe, upLeft) - scaledTurn;
+    result.wheel[1] = dot(scaledStrafe, upRight) + scaledTurn;
+    result.wheel[2] = dot(scaledStrafe, upLeft) + scaledTurn;
+    result.wheel[3] = dot(scaledStrafe, upRight) - scaledTurn;
+    return result;
+}
 
 /* This is the stupidest approach to Mecanum drive code that works.
 Movement is relative to the robot. Here's a visual [< = left,

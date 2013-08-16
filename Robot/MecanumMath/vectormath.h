@@ -38,18 +38,70 @@ vector2d flip(vector2d a) {
 vector2d sub(vector2d a, vector2d b) {
     return add(a, flip(b));
 }
+scalar_t normalizeAngle(scalar_t theta) {
+    while (theta < 0.0) {
+        theta += PI * 2;
+    }
+    while (theta > (PI * 2)) {
+        theta -= PI * 2;
+    }
+    return theta;
+}
+    
 scalar_t angle(vector2d a) {
     scalar_t result = atan2(a.y,a.x);
-    if (result < 0.0) {
-        result += PI * 2;
-    }
-    return result; //result is in radians
+   return normalizeAngle(result); //result is in radians
 }
 vector2d polarvec(scalar_t angle, scalar_t r) {
     return vec(r * cos(angle), r * sin(angle));
 }
-vector2d rotatevec(vector2d v, scalar_t ang) {
-    return polarvec(angle(v) + ang, len(v));
+
+scalar_t sec(scalar_t x) {
+    return 1.0 / cos(x);
 }
 
+//This function takes an angle and returns the distance to the edge of
+//a unit square from the origin [in that direction]
+scalar_t distToSquare(scalar_t theta) {
+    theta = normalizeAngle(theta);
+    while (1 == 1) {
+        //if it's on the right side of the square
+        if (theta > (1.75 * PI) || theta < (.25 * PI)) {
+            //give us the distance from the center to it
+            return sec(theta);
+        }
+        //else, rotate the square and input by 90 degrees, try again
+        theta = normalizeAngle(theta - (0.5 * PI));
+    }
+    return -1.0;
+}
+
+//This function turns square things into circular ones.
+vector2d squareToCircle(vector2d in) {
+    scalar_t theta = angle(in);
+    scalar_t max_radius = distToSquare(theta);
+    vector2d result = scale(in, 1.0 / max_radius);
+    return result;
+}
+
+//this turns circular things into diamond-y things
+//Note: greatest distance from center is sqrt(2)
+vector2d circleToDiamond(vector2d in) {
+    scalar_t theta = angle(in);
+    //a diamond is just a square rotated 45 degrees
+    scalar_t diamond_radius = distToSquare(theta + (0.25 * PI));
+    //scale our circle up to the diamond
+    vector2d result = scale(in, diamond_radius);
+    return result;
+}
+
+//creates a "dead zone" for joysticks
+vector2d joyclamp(vector2d in) {
+    if (len(in) < 0.05) {
+       return vec(0.0,0.0);
+    }
+    return in;
+}
+
+    
 #endif

@@ -80,6 +80,8 @@ byte[] packettimer = new byte[1];
       joyx1 = joyx1 * 0.5;
       joyy1 = joyy1 * 0.5; //precision mode
    }
+   joyx1 = joyx1 * 0.75;
+   joyy1 = joyy1 * 0.75;
    //float joyx2 = stickx2.getValue();
    //float joyy2 = -1.0 * sticky2.getValue();
    float joyx2 = 0.0;

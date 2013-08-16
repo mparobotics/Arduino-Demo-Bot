@@ -4,36 +4,22 @@ Contributors:
 Alexander Grabanski
 */
 #define GYROPIN 1
-#define TEMPPIN 0
-#define TEMPMAX 5.0
-#define TEMPZERO 2.4311 //At 25 degrees celsius
-#define TEMPSENS 0.0087
-#define GYROMAX 5.0
-#define GYROZERO 2.5161
-#define GYROSENS 0.00721   //gyro sensitivity in V/deg/sec
-#define GYTHRESH 1.0 //Minimum deg/sec to keep track of -- helps with drift
+#define GYROMAX 5
+#define GYROZERO 2.501
+#define GYROSENS .007   //gyro sensitivity in V/deg/sec
+#define GYTHRESH 1 //Minimum deg/sec to keep track of -- helps with drift
 #if !defined GYROH
 #define GYROH
 
-//returns the voltage of the gyro pin.
+//this function returns the voltage of the gyro pin.
 scalar_t readGyroInstantV() {
     return (analogRead(GYROPIN) * GYROMAX) / 1023.0;
-}
-
-//returns the temperature on the temperature pin
-scalar_t readTempV() {
-    return (analogRead(TEMPPIN) * TEMPMAX) / 1023.0;
-}
-
-scalar_t tempVtoC(scalar_t voltage) {
-    return ((voltage - TEMPZERO) / TEMPSENS) + 25.0;
 }
 //this function returns the instantaneous rate of change 
 //(in radians/sec) given the gyro's voltage
 scalar_t gyroVtoRate(scalar_t voltage) {
     return radians((voltage - GYROZERO) / GYROSENS);
 }
-
 scalar_t normalizeAngle(scalar_t angle) {
     if (angle > (2.0 * PI)) {
         return angle - (2.0 * PI);

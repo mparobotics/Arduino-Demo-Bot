@@ -71,7 +71,7 @@ mecanumInstant inferAccel(drivetrain drivestate) {
     scalar_t w1a = voltsToRawAccel(voltSclToReal(drivestate.wheel[1]));
     scalar_t w2a = voltsToRawAccel(voltSclToReal(drivestate.wheel[2]));
     scalar_t w3a = voltsToRawAccel(voltSclToReal(drivestate.wheel[3]));
-    result.strafeAccel.x = theoretAccelToActual * (-w0a + w1a - w2a + w3a);
+    result.strafeAccel.x = theoretAccelToActual * (w0a - w1a + w2a - w3a);
     result.strafeAccel.y = theoretAccelToActual * (w0a + w1a + w2a + w3a);
     result.turnAccel = theoretTurnToActual * (w1a - w0a + w2a - w3a);
     return result;
@@ -85,12 +85,6 @@ at time t*/
 scalar_t accumFunc(scalar_t initAccum, scalar_t incr, scalar_t Cf, scalar_t t) {
     scalar_t k1 = initAccum - (incr / Cf);
     return (incr / Cf) + k1 * exp(-1 * t * Cf);
-}
-scalar_t accumIntegral(scalar_t initPos, scalar_t initVel, 
-                       scalar_t incr, scalar_t Cf, scalar_t t) {
-    scalar_t k1 = initVel - (incr / Cf);
-    scalar_t k2 = initPos + (k1 / Cf);
-    return ((incr * t) / Cf) - ( (k1 / Cf) * exp(-1 * t * Cf)) + k2;
 }
 
 const scalar_t strafeCf = 2; /*coefficient of friction for strafing.
@@ -106,8 +100,7 @@ typedef struct {
 
 /* Okay, now for the interesting stuff. This function takes the current velocity
 and a force of instant acceleration to be applied over time t [seconds], and returns
-the new velocity at the end of the time interval NOTE: Velocities relative to current
-heading.*/
+the new velocity at the end of the time interval */
 mecanumVel integrateAccel(mecanumVel init, mecanumInstant accelForce, scalar_t t) {
     mecanumVel result;
     result.strafeVel.x = accumFunc(init.strafeVel.x, accelForce.strafeAccel.x, strafeCf, t);
@@ -131,25 +124,25 @@ typedef struct {
 and velocity and a drivetrain and a time interval, and it returns a position and
 a velocity.*/
 mecanumPosAndVel inferPos(mecanumPosAndVel init, drivetrain drive, scalar_t t) {
-    mecanumPosAndVel result;
-    mecanumInstant accel = inferAccel(drive);
-    mecanumVel vel = init.velocity;
-    result.velocity = inferVel(vel, drive, t);
-
-    result.angle = accumIntegral(init.angle, vel.turnVel, accel.turnAccel, turnCf, t);
-
-    //LOL hax begin here (to account for rotation)
-    scalar_t mid = (init.angle + result.angle) / 2.0;
-
-    vector2d absvel = rotatevec(vel.strafeVel, mid);
-    vector2d absaccel = rotatevec(accel.strafeAccel, mid);
-
-    result.position.x = accumIntegral(init.position.x, absvel.x,
-                                      absaccel.x, strafeCf, t);
-    result.position.y = accumIntegral(init.position.y, absvel.y,
-                                      absaccel.y, strafeCf, t);
+    mecanumVel currentvel = init.velocity;
+    mecanumVel nextvel = inferVel(currentvel, drive, t);
+    mecanumPosAndVel result = init;
+    
+    /*Below, we use a trapezoidal approximation to the integral. This is an OK idea
+    for accuracy's sake, but in theory, the error would be reduced if a higher-order
+    method were used instead [such as simpson's rule]. FIXME, I guess. However,
+    for all practical purposes, this should be fine, provided that the time intervals
+    between summations are not too long. Before you ascribe position data variations
+    to anything else in the math, write it off as a quirk of the integral approx */
+    
+    result.position.x += 0.5 * (nextvel.strafeVel.x + currentvel.strafeVel.x) * t;
+    result.position.y += 0.5 * (nextvel.strafeVel.y + currentvel.strafeVel.y) * t;
+    result.angle += 0.5 * (currentvel.turnVel + nextvel.turnVel) * t;
+    result.velocity = nextvel;
     return result;
 }
 
+/*TODO: create another version of the above that uses Simpson's Rule or similar,
+purely to be used for isolating inaccuracies in approximation */
 
 #endif
